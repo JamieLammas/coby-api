@@ -18,3 +18,17 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::post('/register', 'RegisterController@register');
+
+Route::group('prefix' => 'hangers', function () {
+    Route::get('/', 'HangersController@index');
+    Route::get('/{hanger}', 'HangersController@show');
+    Route::post('/', 'HangersController@store');
+    Route::patch('/{hanger}', 'HangersController@update');
+    Route::delete('/{hanger}', 'HangersController@destroy');
+
+    Route::group('prefix' => '/{hanger}/photo', function () {
+        Route::post('/', 'PhotoController@store');
+        Route::patch('/{photo}', 'PhotoController@update');
+        Route::delete('/{photo}', 'PhotoController@destroy');
+    });
+});
