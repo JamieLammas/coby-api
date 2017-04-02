@@ -21,14 +21,14 @@ Route::post('/register', 'RegisterController@register');
 
 Route::group(['prefix' => 'hangers'], function () {
     Route::get('/', 'HangerController@index')->middleware('auth:api');
-    Route::get('/{hanger}', 'HangerController@show');
-    Route::post('/', 'HangerController@store')->middleware('auth:api');;
-    Route::patch('/{hanger}', 'HangerController@update');
-    Route::delete('/{hanger}', 'HangerController@destroy');
+    Route::get('/{hanger}', 'HangerController@show')->middleware('auth:api');;
+    Route::post('/', 'HangerController@store')->middleware('auth:api');
+    Route::patch('/{hanger}', 'HangerController@update')->middleware('auth:api');;
+    Route::delete('/{hanger}', 'HangerController@destroy')->middleware('auth:api');;
 
     Route::group(['prefix' => '/{hanger}/photo'], function () {
-        Route::post('/', 'PhotoController@store');
-        Route::patch('/{photo}', 'PhotoController@update');
-        Route::delete('/{photo}', 'PhotoController@destroy');
+        Route::post('/', 'PhotoController@store')->middleware('auth:api');;
+        Route::patch('/{photo}', 'PhotoController@update')->middleware('auth:api');;
+        Route::delete('/{photo}', 'PhotoController@destroy')->middleware('auth:api');;
     });
 });

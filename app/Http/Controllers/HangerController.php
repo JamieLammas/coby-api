@@ -6,6 +6,7 @@ use App\Hanger;
 use App\Photo;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreHangerRequest;
+use App\Transformers\HangerTransformer;
 
 class HangerController extends Controller
 {
@@ -18,6 +19,11 @@ class HangerController extends Controller
         $hanger->save();
 
         //transform
+        return fractal()
+            ->item($hanger)
+            ->parseIncludes(['user', 'photos'])
+            ->transformWith(new HangerTransformer)
+            ->toArray();
     }
 
 }
