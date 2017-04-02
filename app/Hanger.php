@@ -18,6 +18,6 @@ class Hanger extends Model
 
     public function photos()
     {
-        return $this->hasMany(Post::class)->oldestFirst();
+        return $this->hasMany(Photo::class)->oldestFirst();
     }
 }
