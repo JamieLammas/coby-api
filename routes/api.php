@@ -26,7 +26,7 @@ Route::group(['prefix' => 'hangers'], function () {
     Route::patch('/{hanger}', 'HangerController@update')->middleware('auth:api');;
     Route::delete('/{hanger}', 'HangerController@destroy')->middleware('auth:api');;
 
-    Route::group(['prefix' => '/{hanger}/photo'], function () {
+    Route::group(['prefix' => '/{hanger}/photos'], function () {
         Route::post('/', 'PhotoController@store')->middleware('auth:api');;
         Route::patch('/{photo}', 'PhotoController@update')->middleware('auth:api');;
         Route::delete('/{photo}', 'PhotoController@destroy')->middleware('auth:api');;

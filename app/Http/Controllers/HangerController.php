@@ -14,8 +14,6 @@ class HangerController extends Controller
 {
     public function index()
     {
-
-
         $hangers = Hanger::latestFirst()->paginate(3);
         $hangersCollection = $hangers->getCollection();
 
@@ -68,5 +66,15 @@ class HangerController extends Controller
             ->transformWith(new HangerTransformer)
             ->toArray();
     }
+
+    public function destroy(UpdateHangerRequest $request, Hanger $hanger)
+    {
+        $this->authorize('destroy', $hanger);
+
+        $hanger->delete();
+
+        return response(null, 204);
+    }
+
 
 }

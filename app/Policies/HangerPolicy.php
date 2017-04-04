@@ -14,4 +14,9 @@ class HangerPolicy
     {
         return $user->ownsHanger($hanger);
     }
+
+    public function destroy(User $user, Hanger $hanger)
+    {
+        return $user->ownsHanger($hanger);
+    }
 }
