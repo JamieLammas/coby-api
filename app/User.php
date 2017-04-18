@@ -37,4 +37,9 @@ class User extends Authenticatable
     {
         return $this->id === $hanger->user->id;
     }
+
+    public function photos()
+    {
+        return $this->hasManyThrough(Photo::Class, Hanger::class);
+    }
 }
