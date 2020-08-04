@@ -7,11 +7,21 @@ The concept was a simple virtual wardrobe.
 
 - Download this repo.
 
-- Make sure you have composer installed. [composer link]
+- This repo includes a submodule called Laradock, a PHP dev environment for docker.
 
-- Change into the directory
+- In the root directory, create a .env file
 ```sh
-$ cd coby_api
+$ mv .env.example .env
+```
+
+- Change the DB_HOST
+```sh
+$ DB_HOST=mysql
+```
+
+- Change into the laradock directory
+```sh
+$ cd laradock
 ```
 
 - Create a .env file
@@ -19,7 +29,17 @@ $ cd coby_api
 $ mv .env.example .env
 ```
 
-- Install the dependancies
+- Create the containers
+```sh
+$ docker-compose up -d nginx mysql
+```
+
+Change to the workspace environment
+```sh
+$ docker-compose exec workspace bash
+```
+
+- Install the modules
 ```sh
 $ composer install
 ```
@@ -43,6 +63,7 @@ $ php artisan cache:clear
 
 The full list can be found in app/routes/api.php
 
+## User
 
 ### Register a user
 POST /api/register
@@ -54,8 +75,20 @@ POST /api/register
 }
 ```
 Responses
-422
 
+200
+Success
+```
+{
+    "data": {
+        "username": "jamlam",
+        "avatar": "https://www.gravatar.com/avatar/d6a48f034d797eba91f1fbdd641fb689?s=45&d=mm"
+    }
+}
+
+```
+
+422
 Missing required fields
 ```
 {
@@ -85,19 +118,6 @@ Email not unique
         "The email has already been taken."
     ]
 }
-```
-
-200
-
-Success
-```
-{
-    "data": {
-        "username": "jamlam",
-        "avatar": "https://www.gravatar.com/avatar/d6a48f034d797eba91f1fbdd641fb689?s=45&d=mm"
-    }
-}
-
 ```
 
 ### Logging in a user
@@ -175,6 +195,8 @@ Missing or incorrect bearer token
 }
 ```
 
+## Hangers
+
 ### Fetching the list of Hangers
 
 GET /api/hangers
@@ -191,11 +213,62 @@ Responses
 Empty Hangers List
 ```
 {
-    "data": []
+    "data": [],
+    "meta": {
+        "pagination": {
+            "total": 0,
+            "count": 0,
+            "per_page": 3,
+            "current_page": 1,
+            "total_pages": 1,
+            "links": {}
+        }
+    }
 }
 ```
 
-
+Hangers List
+```
+{
+    "data": [
+        {
+            "id": 4,
+            "title": "Trousers",
+            "created_at": "2020-08-04 08:33:55",
+            "created_at_human": "7 seconds ago",
+            "user": {
+                "data": {
+                    "username": "jamlam",
+                    "avatar": "https://www.gravatar.com/avatar/d6a48f034d797eba91f1fbdd641fb689?s=45&d=mm"
+                }
+            }
+        },
+        {
+            "id": 3,
+            "title": "Coats",
+            "created_at": "2020-08-04 08:33:42",
+            "created_at_human": "20 seconds ago",
+            "user": {
+                "data": {
+                    "username": "jamlam",
+                    "avatar": "https://www.gravatar.com/avatar/d6a48f034d797eba91f1fbdd641fb689?s=45&d=mm"
+                }
+            }
+        },
+        ...
+    ],
+    "meta": {
+        "pagination": {
+            "total": 3,
+            "count": 3,
+            "per_page": 3,
+            "current_page": 1,
+            "total_pages": 1,
+            "links": {}
+        }
+    }
+}
+```
 
 401
 Missing or incorrect bearer token
@@ -215,6 +288,7 @@ Authorization Header
 }
 ```
 
+Body
 ```
 {
 	"title": "Shirts"
@@ -223,6 +297,8 @@ Authorization Header
 
 Response
 200 
+
+```
 {
     "data": {
         "id": 1,
@@ -237,6 +313,15 @@ Response
         }
     }
 }
+```
+
+401
+Missing or incorrect bearer token
+```
+{
+    "error": "Unauthenticated."
+}
+```
 
 ### Fetching a specifc Hanger
 GET /api/hangers/{hangerId}
@@ -250,6 +335,7 @@ Authorization Header
 
 Responses
 200
+```
 {
     "data": {
         "id": 1,
@@ -267,4 +353,132 @@ Responses
         }
     }
 }
+```
 
+401
+Missing or incorrect bearer token
+```
+{
+    "error": "Unauthenticated."
+}
+```
+
+### Updating a Hanger
+PATCH /api/hangers/{hangerId}
+
+Authorization Header
+```
+{
+    Authorization: "Bearer your-token"
+}
+```
+
+Body
+```
+{
+	"title": "A new hangers title"
+}
+```
+
+Responses
+
+200
+Success
+```
+{
+    "data": {
+        "id": 2,
+        "title": "A new hangers title",
+        "created_at": "2020-08-04 08:29:45",
+        "created_at_human": "35 minutes ago",
+        "user": {
+            "data": {
+                "username": "jamlam",
+                "avatar": "https://www.gravatar.com/avatar/d6a48f034d797eba91f1fbdd641fb689?s=45&d=mm"
+            }
+        }
+    }
+}
+```
+
+401
+Missing or incorrect bearer token
+```
+{
+    "error": "Unauthenticated."
+}
+```
+
+### Deleting a Hanger
+DELETE /api/hangers/{hangerId}
+
+Authorization Header
+```
+{
+    Authorization: "Bearer your-token"
+}
+```
+
+Responses
+
+204 No Content
+
+401
+Missing or incorrect bearer token
+```
+{
+    "error": "Unauthenticated."
+}
+```
+
+## Photos
+
+### Amazon S3
+All images are stored in S3. For it to work you need to add the following variables to your .env file.
+
+```
+    AWS_KEY=your-key
+    AWS_SECRET=your-secret
+    AWS_REGION=your-region
+    AWS_BUCKET=your-bucket
+```
+
+### Storing a Photo
+POST /api/hangers/{hangerId}/photos
+
+Current implementation isn't complete.
+
+Authorization Header
+```
+{
+    Authorization: "Bearer your-token"
+}
+```
+
+Body
+```
+    "title": "White Shirt",
+    "file_photo": [file],
+    "brand": "Uniqlo",
+    "tag": "Top",
+```
+
+Reponses
+
+401
+Missing or incorrect bearer token
+```
+{
+    "error": "Unauthenticated."
+}
+```
+
+### Updating a Photo
+PATCH /api/hangers/{hangersId}/photos/{photosId}
+
+Currently not implemented.
+
+### Deleting a Photo
+DELETE /api/hangers/{hangersId}/photos/{photosId}
+
+Currently not implemented.
